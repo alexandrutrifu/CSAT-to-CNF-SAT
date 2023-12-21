@@ -1,6 +1,6 @@
 import sys
 from tree import TreeNode, sat_form, de_morgan
-from sat_transforms import sat_to_cnf, print_sat
+from sat_transforms import sat_to_cnf, print_sat, collapse_conjunctions
 
 root = None
 
@@ -40,17 +40,12 @@ if __name__ == "__main__":
 	# TreeNode.traverse(TreeNode.root)
 
 	sat_form = TreeNode.get_sat_form(TreeNode.root)
-	# print(sat_form)
+	# print(sat_form, end="\n\n")
+	sat_form = collapse_conjunctions(sat_form)
 
 	with open("output.txt", "w") as output:
-		output.write(str(sat_to_cnf(sat_form)))
+		# output.write(str(sat_to_cnf(sat_form)))
+		sat_to_cnf(sat_form)
+		output.write(str(collapse_conjunctions(sat_form)))
 
-	print(sat_to_cnf(sat_form))
-	print("")
-	print_sat(sat_to_cnf(sat_form))
-
-	# print("Variabile suplimentare de la " + str(n + 1))
-	# print(sat_to_cnf(sat_form, n + 1))
-
-	# list1 = ['NOT', [['NOT', 1], 'OR', ['NOT', 2]]]
-	# print(de_morgan(list1))
+	print_sat(collapse_conjunctions(sat_form))

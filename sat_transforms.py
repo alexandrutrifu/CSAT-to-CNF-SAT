@@ -37,20 +37,22 @@ def print_sat(sat):
 			operator = sat[index]  # Index of current operator
 
 			# Check if operands are single variables
-			if type(sat[index - 1]) is list:
-				print_sat(sat[index - 1])
-
-			if type(sat[index - 1]) is not list:
-				print(sat[index - 1], end="")
+			if index == 1:
+				if type(sat[index - 1]) is list:
+					print_sat(sat[index - 1])
+				else:
+					print(sat[index - 1], end="")
 
 			if operator == "AND":
 				print()
 
 			if type(sat[index + 1]) is list:
 				print_sat(sat[index + 1])
-
-			if operator == "OR_done":
-				print(" " + str(sat[index + 1]), end="")
+			else:
+				if operator != "AND":
+					print(" " + str(sat[index + 1]), end="")
+				else:
+					print(str(sat[index + 1]))
 
 
 def sat_to_cnf(sat: list or str):
@@ -80,14 +82,55 @@ def sat_to_cnf(sat: list or str):
 			if operator == "OR":
 				sat[index] = "AND"
 
-				sat[index - 1] = [sat[index - 1], "OR_done", extra_var]
+				if type(sat[index - 1]) is list:
+					for i in range(0, len(sat[index - 1]), 2):
+						sat[index - 1][i] = [sat[index - 1][i], "OR_done", extra_var]
+				else:
+					sat[index - 1] = [sat[index - 1], "OR_done", extra_var]
 
-				sat[index + 1] = [sat[index + 1], "OR_done", -extra_var]
+				if type(sat[index + 1]) is list:
+					for i in range(0, len(sat[index + 1]), 2):
+						sat[index + 1][i] = [sat[index + 1][i], "OR_done", -extra_var]
+				else:
+					sat[index + 1] = [sat[index + 1], "OR_done", -extra_var]
 
 				extra_var += 1
 
 	return sat
 
 
-def print_cnf(cnf: list):
-	pass
+def collapse_conjunctions(sat):
+	if len(sat) != 1:
+		for index in range(1, len(sat), 2):
+			operator = sat[index]  # Index of current operator
+
+			if operator == "AND":
+				# Check if operands are single variables
+				if type(sat[index - 1]) is list:
+					for j in range(1, len(sat[index + 1]), 2):
+						if sat[index - 1][j] == "AND":
+							new_sat = []
+							for i in range(3):
+								new_sat.append(sat[index - 1][i])
+							new_sat.append(operator)
+							new_sat.append(sat[index + 1])
+
+							return collapse_conjunctions(new_sat)
+
+				if type(sat[index + 1]) is list:
+					for j in range(1, len(sat[index + 1]), 2):
+						if sat[index + 1][j] == "AND":
+							new_sat = []
+							for i in range(0, index):
+								new_sat.append(sat[i])
+							new_sat.append(operator)
+							for i in range(3):
+								new_sat.append(sat[index + 1][i])
+
+							return collapse_conjunctions(new_sat)
+
+			if type(sat[index - 1]) is list:
+				sat[index - 1] = collapse_conjunctions(sat[index - 1])
+			if type(sat[index + 1]) is list:
+				sat[index + 1] = collapse_conjunctions(sat[index + 1])
+	return sat
