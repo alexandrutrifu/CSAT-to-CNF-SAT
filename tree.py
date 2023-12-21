@@ -8,13 +8,10 @@ def de_morgan(operand: list or str):
 				return "OR"
 			case "OR":
 				return "AND"
-		return ["NOT", operand]
+		return -operand
 
 	# List of operands
 	for item in operand:
-		if item == "NOT":
-			return operand[1]
-
 		operand[operand.index(item)] = de_morgan(item)
 
 	return operand
@@ -101,4 +98,3 @@ class TreeNode:
 				lower_output = TreeNode.get_sat_form(node.children[0])
 
 				return de_morgan(lower_output)
-

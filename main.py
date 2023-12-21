@@ -35,10 +35,12 @@ def parse_input():
 if __name__ == "__main__":
 	info_list = parse_input()  # List of node details extracted from input file
 
-	TreeNode.traverse(TreeNode.root)
+	# TreeNode.traverse(TreeNode.root)
 
 	sat_form = TreeNode.get_sat_form(TreeNode.root)
-	print(sat_form)
+
+	with open("output.txt", "w") as output:
+		output.write(str(sat_form))
 
 	# list1 = ['NOT', [['NOT', 1], 'OR', ['NOT', 2]]]
 	# print(de_morgan(list1))
