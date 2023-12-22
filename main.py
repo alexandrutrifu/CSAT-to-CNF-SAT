@@ -40,12 +40,11 @@ if __name__ == "__main__":
 	# TreeNode.traverse(TreeNode.root)
 
 	sat_form = TreeNode.get_sat_form(TreeNode.root)
-	# print(sat_form, end="\n\n")
 	sat_form = collapse_conjunctions(sat_form)
 
-	with open("output.txt", "w") as output:
-		# output.write(str(sat_to_cnf(sat_form)))
-		sat_to_cnf(sat_form)
-		output.write(str(collapse_conjunctions(sat_form)))
+	with open(sys.argv[2], "w") as output:
+		output.write("Initial:\n" + str(sat_form) + "\n")
+		sat_form = sat_to_cnf(sat_form)
+		output.write("Final:\n" + str(collapse_conjunctions(sat_form)))
 
 	print_sat(collapse_conjunctions(sat_form))
