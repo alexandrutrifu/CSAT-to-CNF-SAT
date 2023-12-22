@@ -1,6 +1,6 @@
 import sys
 from tree import TreeNode, sat_form, de_morgan
-from sat_transforms import sat_to_cnf, print_sat, collapse_conjunctions
+from sat_transforms import sat_to_cnf, collapse_conjunctions
 
 root = None
 
@@ -34,6 +34,29 @@ def parse_input():
 	return [inputs, no_nodes]
 
 
+def print_sat(sat, output):
+	if len(sat) != 1:
+		for index in range(1, len(sat), 2):
+			operator = sat[index]  # Index of current operator
+
+			# Check if operands are single variables
+			if index == 1:
+				if type(sat[index - 1]) is list:
+					print_sat(sat[index - 1], output)
+				else:
+					output.write(str(sat[index - 1]))
+					output.write(" ")
+
+			if operator == "AND":
+				output.write("\n")
+
+			if type(sat[index + 1]) is list:
+				print_sat(sat[index + 1], output)
+			else:
+				output.write(str(sat[index + 1]))
+				output.write(" ")
+
+
 if __name__ == "__main__":
 	[i, n] = parse_input()  # List of node details extracted from input file
 
@@ -41,10 +64,8 @@ if __name__ == "__main__":
 
 	sat_form = TreeNode.get_sat_form(TreeNode.root)
 	sat_form = collapse_conjunctions(sat_form)
+	sat_form = sat_to_cnf(sat_form)
+	sat_form = collapse_conjunctions(sat_form)
 
 	with open(sys.argv[2], "w") as output:
-		output.write("Initial:\n" + str(sat_form) + "\n")
-		sat_form = sat_to_cnf(sat_form)
-		output.write("Final:\n" + str(collapse_conjunctions(sat_form)))
-
-	print_sat(collapse_conjunctions(sat_form))
+		print_sat(collapse_conjunctions(sat_form), output)
